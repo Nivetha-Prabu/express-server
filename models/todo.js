@@ -13,4 +13,10 @@ module.exports = function(sequelize, DataTypes) {
 		defaultValue: false
 	}
 });
-};
+}
+	// hack: {
+	// 	type: DataTypes.STRING,
+	// 	allowNull: false,
+	// 	validate: {
+	// 		len: [1,250]
+	// 	}
