@@ -35,37 +35,69 @@ app.get('/',  function(req,res) {
 //GET /todos?completed=false&q=work
 app.get('/todos', function(req,res) {
 
-	var queryParams = req.query;
-	var filteredTodos = todos;
-	if(queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
-		filteredTodos = _.where(filteredTodos, {completed:true});
-	} else if(queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
-		filteredTodos= _.where(filteredTodos, {completed:false});
+	// var queryParams = req.query;
+	var query = req.query;
+	var where = {};
+
+	if(query.hasOwnProperty('completed') && query.completed === 'true') {
+		where.completed=true;
+	 } else if(query.hasOwnProperty('completed') && query.completed === 'false') {
+		where.completed=false;
 	}
-	if(queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
-		filteredTodos = _.filter(filteredTodos, function (todo) {
-			return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
-		});
+	if(query.hasOwnProperty('q') && query.q.length > 0) {
+		where.description = {
+			$like: '%' + query.q + '%'
+		};
 	}
-	res.json(filteredTodos);
+	db.todo.findAll({where: where}). then(function (todos) {
+		res.json(todos);
+	}, function(e) {
+		res.status(500).send();
+			});
+	});
+	// var filteredTodos = todos;
+	// if(queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
+	// 	filteredTodos = _.where(filteredTodos, {completed:true});
+	// } else if(queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
+	// 	filteredTodos= _.where(filteredTodos, {completed:false});
+	// }
+	// if(queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
+	// 	filteredTodos = _.filter(filteredTodos, function (todo) {
+	// 		return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
+	// 	});
+	// }
+	// res.json(filteredTodos);
 
 	
-});
+
 app.get('/todos/:id', function(req,res) {
 	var todoId=parseInt(req.params.id,10);
-	var matchedTodo=_.findWhere(todos,{id: todoId});
+
+	db.todo.findById(todoId).then(function (todo) {
+		if (!!todo) {                                 
+			res.json(todo.toJSON());
+		} else {
+			res.status(404).send();
+		}
+		}, function(e) {
+		res.status(400).send();
+	});
+	});
+
+
+
+		// var matchedTodo=_.findWhere(todos,{id: todoId});
 
 	// todos.forEach(function(todo){
 	// 	if(todoId===todo.id){
 	// 		matchedTodo=todo;
 	// 	}
 	// });
-	if (matchedTodo) {
-		res.json(matchedTodo);
-	} else {
-		res.status(404).send();
-	}
-});
+	// if (matchedTodo) {
+	// 	res.json(matchedTodo);
+	// } else {
+	// 	res.status(404).send();
+	// }
 
 //POST /todos
 app.post('/todos', function (req,res) {
