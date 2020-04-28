@@ -100,23 +100,45 @@ app.get('/todos/:id', function(req,res) {
 	// }
 
 //POST /todos
-app.post('/users', function (req,res) {
-	var body = _.pick(req.body, 'email', 'password');
-	db.user.create(body).then(function (user) {
-		res.json(user.toJSON());
+app.post('/todos', function (req,res) {
+	var body = _.pick(req.body, 'description', 'completed');
+	db.todo.create(body).then(function (todo) {
+		res.json(todo.toJSON());
 	}, function(e) {
 		res.status(400).json(e);
 	});
 	});
-	// var body = _pick(req.body, 'description', 'completed');
-	// if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length=== 0) {
-	// 	return res.status(400).send();
-	// }
-	// body.id=todoNextId++;
-	// todos.push(body);
-	// // console.log('id:' +body.id);
-	// // console.log('description:' +body.description);
-	// res.json(body);
+
+// app.post('/users/login', function (req,res) {
+// 	var body = _.pick(req.body, 'email', 'password');
+
+// 	if(typeof body.email !== 'string' || typeof body.password !== 'string'){
+// 		return res.status(400).send();
+// 	}
+// 	db.user.findOne({
+// 		where: {
+// 			email: body.email
+// 		}
+// 	}). then(function (user) {
+// 		if(!user || bcrypt.compareSync(body.password, user.get('password_hash'))) {
+// 			return res.status(401).send();
+// 		}
+// 		res.json(user.toPublicJSON());
+// 	}, function (e) {
+// 		res.status(500).send();
+// 	});
+// 	});
+
+
+// 	// var body = _pick(req.body, 'description', 'completed');
+// 	// if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length=== 0) {
+// 	// 	return res.status(400).send();
+// 	// }
+// 	// body.id=todoNextId++;
+// 	// todos.push(body);
+// 	// // console.log('id:' +body.id);
+// 	// // console.log('description:' +body.description);
+// 	// res.json(body);
 
 //DELETE /todos/:id
 app.delete('/todos/:id', function(req,res) {
@@ -195,6 +217,15 @@ app.put('/todos/:id', function(req,res) {
 // 	res.json(matchedTodo);
 
 // });
+
+app.post('/users', function (req,res) {
+	var body = _.pick(req.body, 'email', 'password');
+	db.user.create(body).then(function (user) {
+		res.json(user.toJSON());
+	}, function(e) {
+		res.status(400).json(e);
+	});
+	});
 
 db.sequelize.sync().then(function() {
 app.listen(PORT, function(){
